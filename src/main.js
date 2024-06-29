@@ -39,3 +39,15 @@ function addLocalStorage(value, id) {
 
 //TODO-4
 //Відформатуйте код таким чином, щоб данні в сховищі зберігались у вигляді об'єкта { id: value, text: value}, розмітка додавалась з айдішніком на елемент списку li, айдішнік генерувати з допомогою бібліотеки nanoid, її треба встановити
+
+
+//TODO-5
+// Написати функцію, яка буде при завантаженні сторінки відмальовувати розмітку беручи данні з ЛС
+
+(() => {
+  const items = JSON.parse(localStorage.getItem(taskKey));
+  const markup = items.map((item) => {
+    return `<li id="${item.id}">${item.text} <button type="button">X</button></li>`;
+  }).join('')
+  taskList.insertAdjacentHTML('beforeend', markup);
+})();

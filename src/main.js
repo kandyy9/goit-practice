@@ -14,16 +14,13 @@ taskForm.addEventListener('submit', evt => {
   const value = evt.target.elements.taskName.value.trim();
   if (!value) return;
   const id = nanoid();
-  addItem(value, id);
+  taskList.insertAdjacentHTML('beforeend', addItem({ id, text: value }));
   addLocalStorage(value, id);
   evt.target.reset();
 });
 
-function addItem(item, id) {
-  taskList.insertAdjacentHTML(
-    'beforeend',
-    `<li id="${id}">${item} <button class="close-btn" type="button">X</button></li>`
-  );
+function addItem({ id, text }) {
+  return `<li id="${id}">${text} <button class="close-btn" type="button">X</button></li>`;
 }
 
 //TODO-3
@@ -31,33 +28,36 @@ function addItem(item, id) {
 // а не перезаписуватись існуюча
 
 function addLocalStorage(value, id) {
-  const allValue = JSON.parse(localStorage.getItem(taskKey)) ?? [];
+  const allValue = getFromLocalStorage(taskKey) ?? [];
   allValue.push({ id, text: value });
-  localStorage.setItem(taskKey, JSON.stringify(allValue));
+  setToLocalStorage(taskKey, allValue);
 }
 
 //TODO-4
 //Відформатуйте код таким чином, щоб данні в сховищі зберігались у вигляді об'єкта { id: value, text: value}, розмітка додавалась з айдішніком на елемент списку li, айдішнік генерувати з допомогою бібліотеки nanoid, її треба встановити
 
-
 //TODO-5
 // Написати функцію, яка буде при завантаженні сторінки відмальовувати розмітку беручи данні з ЛС
 
 (() => {
-    const items = JSON.parse(localStorage.getItem(taskKey));
-    if (!items) return;
-  const markup = items.map((item) => {
-    return `<li id="${item.id}">${item.text} <button class="close-btn" type="button">X</button></li>`;
-  }).join('')
+  const items = getFromLocalStorage(taskKey);
+  if (!items) return;
+  const markup = items.map(addItem).join('');
   taskList.insertAdjacentHTML('beforeend', markup);
 })();
 
+taskList.addEventListener('click', evt => {
+  if (!evt.target.classList.contains('close-btn')) return;
+  const id = evt.target.parentNode.id;
+  const items = getFromLocalStorage(taskKey);
+  const filteredItems = items.filter(item => item.id !== id);
+  setToLocalStorage(taskKey, filteredItems);
+  evt.target.parentNode.remove();
+});
 
-taskList.addEventListener("click", (evt) => {
-    if (!(evt.target.classList.contains("close-btn"))) return;
-    const id = evt.target.parentNode.id;
-    const items = JSON.parse(localStorage.getItem(taskKey));
-    const filteredItems = items.filter((item) => item.id !== id);
-    localStorage.setItem(taskKey, JSON.stringify(filteredItems));
-    evt.target.parentNode.remove();
-})
+function getFromLocalStorage(key) {
+  return JSON.parse(localStorage.getItem(key));
+}
+function setToLocalStorage(key, value) {
+  localStorage.setItem(key, JSON.stringify(value));
+}

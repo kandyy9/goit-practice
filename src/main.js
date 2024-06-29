@@ -14,7 +14,6 @@ taskForm.addEventListener('submit', evt => {
   const value = evt.target.elements.taskName.value.trim();
   if (!value) return;
   const id = nanoid();
-  console.log(value);
   addItem(value, id);
   addLocalStorage(value, id);
   evt.target.reset();
@@ -23,7 +22,7 @@ taskForm.addEventListener('submit', evt => {
 function addItem(item, id) {
   taskList.insertAdjacentHTML(
     'beforeend',
-    `<li id="${id}">${item} <button type="button">X</button></li>`
+    `<li id="${id}">${item} <button class="close-btn" type="button">X</button></li>`
   );
 }
 
@@ -45,9 +44,20 @@ function addLocalStorage(value, id) {
 // Написати функцію, яка буде при завантаженні сторінки відмальовувати розмітку беручи данні з ЛС
 
 (() => {
-  const items = JSON.parse(localStorage.getItem(taskKey));
+    const items = JSON.parse(localStorage.getItem(taskKey));
+    if (!items) return;
   const markup = items.map((item) => {
-    return `<li id="${item.id}">${item.text} <button type="button">X</button></li>`;
+    return `<li id="${item.id}">${item.text} <button class="close-btn" type="button">X</button></li>`;
   }).join('')
   taskList.insertAdjacentHTML('beforeend', markup);
 })();
+
+
+taskList.addEventListener("click", (evt) => {
+    if (!(evt.target.classList.contains("close-btn"))) return;
+    const id = evt.target.parentNode.id;
+    const items = JSON.parse(localStorage.getItem(taskKey));
+    const filteredItems = items.filter((item) => item.id !== id);
+    localStorage.setItem(taskKey, JSON.stringify(filteredItems));
+    evt.target.parentNode.remove();
+})

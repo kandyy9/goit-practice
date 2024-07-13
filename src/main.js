@@ -1,4 +1,5 @@
 import { nanoid } from 'nanoid';
+import { getFromLocalStorage, setToLocalStorage } from './js/ls-helpers'
 
 const taskForm = document.querySelector('#task-form');
 const taskList = document.querySelector('#task-list');
@@ -31,9 +32,9 @@ function addItem(item, id) {
 // а не перезаписуватись існуюча
 
 function addLocalStorage(value, id) {
-  const allValue = JSON.parse(localStorage.getItem(taskKey)) ?? [];
+  const allValue = getFromLocalStorage(taskKey)?? [];
   allValue.push({ id, text: value });
-  localStorage.setItem(taskKey, JSON.stringify(allValue));
+  setToLocalStorage(allValue, taskKey);
 }
 
 //TODO-4
@@ -44,7 +45,7 @@ function addLocalStorage(value, id) {
 // Написати функцію, яка буде при завантаженні сторінки відмальовувати розмітку беручи данні з ЛС
 
 (() => {
-    const items = JSON.parse(localStorage.getItem(taskKey));
+    const items = getFromLocalStorage(taskKey);
     if (!items) return;
   const markup = items.map((item) => {
     return `<li id="${item.id}">${item.text} <button class="close-btn" type="button">X</button></li>`;
@@ -56,8 +57,8 @@ function addLocalStorage(value, id) {
 taskList.addEventListener("click", (evt) => {
     if (!(evt.target.classList.contains("close-btn"))) return;
     const id = evt.target.parentNode.id;
-    const items = JSON.parse(localStorage.getItem(taskKey));
+    const items = getFromLocalStorage(taskKey);
     const filteredItems = items.filter((item) => item.id !== id);
-    localStorage.setItem(taskKey, JSON.stringify(filteredItems));
+    setToLocalStorage(filteredItems, taskKey);
     evt.target.parentNode.remove();
 })

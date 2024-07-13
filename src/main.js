@@ -8,8 +8,8 @@ import { delElement } from './js/delElement';
 // Напишіть логіку обробнику подій по сабміту
 // При сабміті треба у змінну записувати значення поля інпута
 // Повинна бути перевірка на порожнє поле.
-delElement(refs.taskList, taskKey);
-immediateMarkup();
+delElement({ elemOfList: refs.taskList, taskKey });
+immediateMarkup(refs.taskList, taskKey);
 refs.taskForm.addEventListener('submit', evt => {
   evt.preventDefault();
   const value = evt.target.elements.taskName.value.trim();
